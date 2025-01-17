@@ -4,6 +4,7 @@ import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 import { isValidObjectId, Model } from 'mongoose';
 import { Pokemon } from './entities/pokemon.entity';
 import { InjectModel } from '@nestjs/mongoose';
+import { PokemonSeed } from 'src/seed/interfaces/pokemon-seed.interface';
 
 @Injectable()
 export class PokemonService {
@@ -68,10 +69,26 @@ export class PokemonService {
     async remove(id: string) {
         const { deletedCount } = await this.pokemonModel.deleteOne({ _id: id })
 
-        if (deletedCount === 0) 
+        if (deletedCount === 0)
             throw new BadRequestException(`Pokemon with id "${id}" not found`)
 
         return;
+    }
+
+    async removeSeed() {
+        try {
+            await this.pokemonModel.deleteMany();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async createSeed(pokemons: PokemonSeed[]) {
+        try {
+            await this.pokemonModel.insertMany(pokemons);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     private handleExceptions(error: any) {
